@@ -502,3 +502,4 @@ To Clone or Leech gdtot link follow these steps:
 4. From this you have to paste value of crypt in config.env file.
 
 -----
+  [![Manually Deploy to Heroku](https://github.com/Frozen12/mirror-leech-telegram-bot/actions/workflows/deploy.yml/badge.svg?branch=heroku)](https://github.com/Frozen12/mirror-leech-telegram-bot/actions/workflows/deploy.yml)
