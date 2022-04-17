@@ -1,4 +1,4 @@
-import requests
+from requests import get as rget, utils as rutils
 
 from re import match, search, split as resplit
 from time import sleep, time
@@ -230,7 +230,7 @@ class MirrorListener:
             buttons.buildbutton("☁️ Drive Link", link)
             LOGGER.info(f'Done Uploading {name}')
             if INDEX_URL is not None:
-                url_path = requests.utils.quote(f'{name}')
+                url_path = rutils.quote(f'{name}')
                 share_url = f'{INDEX_URL}/{url_path}'
                 if ospath.isdir(f'{DOWNLOAD_DIR}/{self.uid}/{name}'):
                     share_url += '/'
@@ -357,6 +357,7 @@ def _mirror(bot, message, isZip=False, extract=False, isQbit=False, isLeech=Fals
                     sleep(3)
                     nextmsg = type('nextmsg', (object, ), {'chat_id': message.chat_id, 'message_id': message.reply_to_message.message_id + 1})
                     nextmsg = sendMessage(message_args[0], bot, nextmsg)
+                    nextmsg.from_user.id = message.from_user.id
                     multi -= 1
                     sleep(3)
                     Thread(target=_mirror, args=(bot, nextmsg, isZip, extract, isQbit, isLeech, pswd, multi)).start()
@@ -407,7 +408,7 @@ def _mirror(bot, message, isZip=False, extract=False, isQbit=False, isLeech=Fals
             content_type = get_content_type(link)
         if content_type is None or match(r'application/x-bittorrent|application/octet-stream', content_type):
             try:
-                resp = requests.get(link, timeout=10, headers = {'user-agent': 'Wget/1.12'})
+                resp = rget(link, timeout=10, headers = {'user-agent': 'Wget/1.12'})
                 if resp.status_code == 200:
                     file_name = str(time()).replace(".", "") + ".torrent"
                     with open(file_name, "wb") as t:
@@ -452,6 +453,7 @@ def _mirror(bot, message, isZip=False, extract=False, isQbit=False, isLeech=Fals
         sleep(3)
         nextmsg = type('nextmsg', (object, ), {'chat_id': message.chat_id, 'message_id': message.reply_to_message.message_id + 1})
         nextmsg = sendMessage(message_args[0], bot, nextmsg)
+        nextmsg.from_user.id = message.from_user.id
         multi -= 1
         sleep(3)
         Thread(target=_mirror, args=(bot, nextmsg, isZip, extract, isQbit, isLeech, pswd, multi)).start()
