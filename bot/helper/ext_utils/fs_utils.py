@@ -18,24 +18,22 @@ def clean_download(path: str):
         LOGGER.info(f"Cleaning Download: {path}")
         try:
             rmtree(path)
-        except FileNotFoundError:
+        except:
             pass
 
 def start_cleanup():
     try:
         rmtree(DOWNLOAD_DIR)
-    except FileNotFoundError:
+    except:
         pass
     makedirs(DOWNLOAD_DIR)
 
 def clean_all():
     aria2.remove_all(True)
-    qbc = get_client()
-    qbc.torrents_delete(torrent_hashes="all", delete_files=True)
-    qbc.app_shutdown()
+    get_client().torrents_delete(torrent_hashes="all")
     try:
         rmtree(DOWNLOAD_DIR)
-    except FileNotFoundError:
+    except:
         pass
 
 def exit_clean_up(signal, frame):
