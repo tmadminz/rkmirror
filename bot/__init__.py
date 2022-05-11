@@ -2,7 +2,6 @@ from logging import getLogger, FileHandler, StreamHandler, INFO, basicConfig, er
 from socket import setdefaulttimeout
 from faulthandler import enable as faulthandler_enable
 from telegram.ext import Updater as tgUpdater
-from qbittorrentapi import Client as qbClient
 from aria2p import API as ariaAPI, Client as ariaClient
 from os import remove as osremove, path as ospath, environ
 from requests import get as rget
@@ -56,7 +55,6 @@ except:
 PORT = environ.get('PORT', SERVER_PORT)
 alive = Popen(["python3", "alive.py"])
 Popen([f"gunicorn web.wserver:app --bind 0.0.0.0:{PORT}"], shell=True)
-srun(["qbittorrent-nox", "-d", "--profile=."])
 if not ospath.exists('.netrc'):
     srun(["touch", ".netrc"])
 srun(["cp", ".netrc", "/root/.netrc"])
@@ -83,9 +81,6 @@ aria2 = ariaAPI(
         secret="",
     )
 )
-
-def get_client():
-    return qbClient(host="localhost", port=8090)
 
 trackers = check_output(["curl -Ns https://raw.githubusercontent.com/XIU2/TrackersListCollection/master/all.txt https://ngosang.github.io/trackerslist/trackers_all_http.txt https://newtrackon.com/api/all | awk '$0'"], shell=True).decode('utf-8')
 trackerslist = set(trackers.split("\n"))
@@ -415,11 +410,6 @@ try:
     EQUAL_SPLITS = EQUAL_SPLITS.lower() == 'true'
 except:
     EQUAL_SPLITS = False
-try:
-    QB_SEED = getConfig('QB_SEED')
-    QB_SEED = QB_SEED.lower() == 'true'
-except:
-    QB_SEED = False
 try:
     CUSTOM_FILENAME = getConfig('CUSTOM_FILENAME')
     if len(CUSTOM_FILENAME) == 0:
