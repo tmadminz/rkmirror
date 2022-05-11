@@ -4,12 +4,12 @@ SHELL ["/bin/bash", "-c"]
 MAINTAINER @frozen12
 ENV DEBIAN_FRONTEND="noninteractive"
 
-RUN curl -L 'https://raw.githubusercontent.com/Frozen12/TGMirrorBot/master/storage/megasdkrest-amd64' -o /usr/local/bin/megasdkrest && chmod +x /usr/local/bin/megasdkrest
+RUN apt -y install curl && curl -L 'https://raw.githubusercontent.com/Frozen12/TGMirrorBot/master/storage/megasdkrest-amd64' -o /usr/local/bin/megasdkrest && chmod +x /usr/local/bin/megasdkrest
 
 RUN apt -y update && \
     apt install -y software-properties-common \
     python3 python3-pip libssl-dev libc-ares-dev \
-    tzdata p7zip-full xz-utils curl pv jq \
+    tzdata p7zip-full xz-utils pv jq \
     locales git libsodium-dev  rtmpdump libmagic-dev p7zip-rar \
     wget ffmpeg libcrypto++-dev unzip libcurl4-openssl-dev \
     libsqlite3-dev libfreeimage-dev libpq-dev libffi-dev && \
