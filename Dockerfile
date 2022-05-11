@@ -2,7 +2,6 @@ FROM ubuntu:20.04
 WORKDIR /usr/src/app
 SHELL ["/bin/bash", "-c"]
 MAINTAINER @frozen12
-ENV LC_ALL en_US.UTF-16
 ENV DEBIAN_FRONTEND="noninteractive"
 
 RUN apt-get -y update && \
@@ -35,7 +34,7 @@ wget -q https://github.com/P3TERX/aria2.conf/raw/master/dht6.dat -O /usr/src/app
 RUN chmod +x aria.sh
 
 RUN locale-gen en_US.UTF-8
-#ENV LANG en_US.UTF-8
-#ENV LANGUAGE en_US:en
-# ENV LC_ALL en_US.UTF-8
+ENV LANG en_US.UTF-8
+ENV LANGUAGE en_US:en
+ENV LC_ALL en_US.UTF-8
 CMD ["bash","start.sh"]
