@@ -18,7 +18,7 @@ COPY . .
 RUN pip3 install --no-cache-dir -r required.txt
 
 RUN wget -q -O megasdkrest 'https://raw.githubusercontent.com/Frozen12/TGMirrorBot/master/storage/megasdkrest-amd64' -P /usr/local/bin/ && chmod +x /usr/local/bin/megasdkrest \
-       && apt -y update && apt -y upgrade && apt -y autoremove && apt -y autoclean
+       && apt -y update && apt -y upgrade && apt-get -y autoremove-get && apt-get -y autoclean
 
 COPY . .
 COPY extract /usr/local/bin
