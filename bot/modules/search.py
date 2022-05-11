@@ -6,7 +6,7 @@ from urllib.parse import quote
 from telegram import InlineKeyboardMarkup
 from telegram.ext import CommandHandler, CallbackQueryHandler
 
-from bot import dispatcher, LOGGER, SEARCH_API_LINK, SEARCH_PLUGINS, get_client, SEARCH_LIMIT
+from bot import dispatcher, LOGGER, SEARCH_API_LINK, SEARCH_PLUGINS, SEARCH_LIMIT
 from bot.helper.ext_utils.telegraph_helper import telegraph
 from bot.helper.telegram_helper.message_utils import editMessage, sendMessage, sendMarkup
 from bot.helper.telegram_helper.filters import CustomFilters
@@ -16,14 +16,7 @@ from bot.helper.telegram_helper import button_build
 
 if SEARCH_PLUGINS is not None:
     PLUGINS = []
-    qbclient = get_client()
-    qb_plugins = qbclient.search_plugins()
-    if qb_plugins:
-        for plugin in qb_plugins:
-            qbclient.search_uninstall_plugin(names=plugin['name'])
-    qbclient.search_install_plugin(SEARCH_PLUGINS)
-    qbclient.auth_log_out()
-
+    
 SITES = {
     "1337x": "1337x",
     "yts": "YTS",
@@ -247,12 +240,6 @@ def _api_buttons(user_id, method):
 
 def _plugin_buttons(user_id):
     buttons = button_build.ButtonMaker()
-    if not PLUGINS:
-        qbclient = get_client()
-        pl = qbclient.search_plugins()
-        for name in pl:
-            PLUGINS.append(name['name'])
-        qbclient.auth_log_out()
     for siteName in PLUGINS:
         buttons.sbutton(siteName.capitalize(), f"torser {user_id} {siteName} plugin")
     buttons.sbutton('All', f"torser {user_id} all plugin")
