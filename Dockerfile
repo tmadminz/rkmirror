@@ -9,7 +9,7 @@ RUN apt -y update && \
     python3 python3-pip libssl-dev libc-ares-dev \
     tzdata p7zip-full xz-utils curl pv jq \
     locales git libsodium-dev  rtmpdump libmagic-dev p7zip-rar \
-    aria2 wget ffmpeg libcrypto++-dev unzip libcurl4-openssl-dev \
+    wget ffmpeg libcrypto++-dev unzip libcurl4-openssl-dev \
     libsqlite3-dev libfreeimage-dev libpq-dev libffi-dev && \
     locale-gen en_US.UTF-8
 
@@ -18,7 +18,7 @@ COPY . .
 RUN pip3 install --no-cache-dir -r required.txt
 
 RUN wget -q -O megasdkrest 'https://raw.githubusercontent.com/Frozen12/TGMirrorBot/master/storage/megasdkrest-amd64' -P /usr/local/bin/ && chmod +x /usr/local/bin/megasdkrest \
-       && apt -y update && apt -y upgrade && apt-get -y autoremove-get && apt-get -y autoclean
+       && apt-get -y update && apt-get -y upgrade && apt-get -y install aria2 && apt-get -y autoremove-get && apt-get -y autoclean
 
 COPY . .
 COPY extract /usr/local/bin
