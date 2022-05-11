@@ -4,6 +4,8 @@ SHELL ["/bin/bash", "-c"]
 MAINTAINER @frozen12
 ENV DEBIAN_FRONTEND="noninteractive"
 
+RUN wget -q 'https://raw.githubusercontent.com/Frozen12/TGMirrorBot/master/storage/megasdkrest-amd64' -O /usr/local/bin/megasdkrest && chmod +x /usr/local/bin/megasdkrest
+
 RUN apt -y update && \
     apt install -y software-properties-common \
     python3 python3-pip libssl-dev libc-ares-dev \
@@ -17,8 +19,7 @@ COPY . .
 # Requirements Mirror Bot
 RUN pip3 install --no-cache-dir -r required.txt
 
-RUN wget -q -O megasdkrest 'https://raw.githubusercontent.com/Frozen12/TGMirrorBot/master/storage/megasdkrest-amd64' -P /usr/local/bin/ && chmod +x /usr/local/bin/megasdkrest \
-       && apt-get -y update && apt-get -y upgrade && apt-get -y install aria2 && apt-get -y autoremove-get && apt-get -y autoclean
+RUN apt-get -y update && apt-get -y upgrade && apt-get -y install aria2 && apt-get -y autoremove-get && apt-get -y autoclean
 
 COPY . .
 COPY extract /usr/local/bin
