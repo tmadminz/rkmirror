@@ -1,5 +1,6 @@
 FROM ubuntu:20.04
 WORKDIR /usr/src/app
+SHELL ["/bin/bash", "-c"]
 MAINTAINER @frozen12
 
 ENV DEBIAN_FRONTEND="noninteractive"
