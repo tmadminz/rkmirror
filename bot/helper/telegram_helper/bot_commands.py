@@ -41,5 +41,5 @@ class _BotCommands:
         self.RssSubCommand = f'rsssub{CMD_INDEX}'
         self.RssUnSubCommand = f'rssunsub{CMD_INDEX}'
         self.RssSettingsCommand = f'rssset{CMD_INDEX}'
-
+        self.SpeedCommand = f'speedtest{CMD_INDEX}'
 BotCommands = _BotCommands()
