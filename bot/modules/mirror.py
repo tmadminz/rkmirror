@@ -287,7 +287,7 @@ def _mirror(bot, message, isZip=False, extract=False, isLeech=False, pswd=None, 
     is_gdtot = False
     try:
         link = message_args[1]
-        if link.startswith("s ") or link == "
+        if link.startswith("s ") or link == "s":
             message_args = mesg[0].split(' ', maxsplit=2)
             link = message_args[2].strip()
         elif link.isdigit():
