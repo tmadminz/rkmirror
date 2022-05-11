@@ -283,7 +283,7 @@ class MirrorListener:
 def _mirror(bot, message, isZip=False, extract=False, isLeech=False, pswd=None, multi=0):
     mesg = message.text.split('\n')
     message_args = mesg[0].split(' ', maxsplit=1)
-    name_args = mesg[0].split('|', maxsplit=
+    name_args = mesg[0].split('|', maxsplit=1)
     is_gdtot = False
     try:
         link = message_args[1]
