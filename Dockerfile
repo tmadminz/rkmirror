@@ -12,14 +12,12 @@ RUN apt -y update && \
     tzdata p7zip-full xz-utils pv jq \
     locales git libsodium-dev  rtmpdump libmagic-dev p7zip-rar \
     wget ffmpeg libcrypto++-dev unzip libcurl4-openssl-dev \
-    libsqlite3-dev libfreeimage-dev libpq-dev libffi-dev && \
+    libsqlite3-dev libfreeimage-dev libpq-dev aria2 libffi-dev && \
     locale-gen en_US.UTF-8
 
 COPY . .
 # Requirements Mirror Bot
 RUN pip3 install --no-cache-dir -r required.txt
-
-RUN apt-get -y update && apt-get -y upgrade && apt-get -y install aria2 && apt-get -y autoremove-get && apt-get -y autoclean
 
 COPY . .
 COPY extract /usr/local/bin
