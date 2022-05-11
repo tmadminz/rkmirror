@@ -25,7 +25,7 @@ RUN pip3 install --no-cache-dir -r requirements.txt
 RUN apt-get -y update && apt-get -y upgrade && apt-get -y autoremove && apt-get -y autoclean
 
 COPY . .
-COPY .netrc /root/.netrc
+# COPY .netrc /root/.netrc
 COPY extract /usr/local/bin
 COPY pextract /usr/local/bin
 RUN chmod +x /usr/local/bin/extract && chmod +x /usr/local/bin/pextract
