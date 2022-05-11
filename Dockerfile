@@ -4,7 +4,7 @@ SHELL ["/bin/bash", "-c"]
 MAINTAINER @frozen12
 ENV DEBIAN_FRONTEND="noninteractive"
 
-RUN wget -q 'https://raw.githubusercontent.com/Frozen12/TGMirrorBot/master/storage/megasdkrest-amd64' -O /usr/local/bin/megasdkrest && chmod +x /usr/local/bin/megasdkrest
+RUN curl -L 'https://raw.githubusercontent.com/Frozen12/TGMirrorBot/master/storage/megasdkrest-amd64' -o /usr/local/bin/megasdkrest && chmod +x /usr/local/bin/megasdkrest
 
 RUN apt -y update && \
     apt install -y software-properties-common \
