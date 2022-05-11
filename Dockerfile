@@ -6,7 +6,7 @@ ENV DEBIAN_FRONTEND="noninteractive"
 
 RUN apt-get -y update && \
         apt-get install -y software-properties-common \
-    python3 python3-pip aria2 ffmpeg \
+    python3 python3-pip aria2 wget ffmpeg \
     tzdata p7zip-full p7zip-rar xz-utils curl pv jq \
     locales git unzip rtmpdump libmagic-dev libcurl4-openssl-dev \
     libssl-dev libc-ares-dev libsodium-dev libcrypto++-dev \
