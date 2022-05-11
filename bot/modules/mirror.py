@@ -12,7 +12,7 @@ from telegram.ext import CommandHandler
 from telegram import InlineKeyboardMarkup
 
 from bot import Interval, INDEX_URL, BUTTON_FOUR_NAME, BUTTON_FOUR_URL, BUTTON_FIVE_NAME, BUTTON_FIVE_URL, \
-                BUTTON_SIX_NAME, BUTTON_SIX_URL, BLOCK_MEGA_FOLDER, BLOCK_MEGA_LINKS, VIEW_LINK, aria2, QB_SEED, \
+                BUTTON_SIX_NAME, BUTTON_SIX_URL, BLOCK_MEGA_FOLDER, BLOCK_MEGA_LINKS, VIEW_LINK, aria2, \
                 dispatcher, DOWNLOAD_DIR, download_dict, download_dict_lock, TG_SPLIT_SIZE, LOGGER, MEGA_KEY, DB_URI, \
                 INCOMPLETE_TASK_NOTIFIER
 from bot.helper.ext_utils.bot_utils import is_url, is_magnet, is_gdtot_link, is_mega_link, is_gdrive_link, get_content_type
@@ -21,7 +21,6 @@ from bot.helper.ext_utils.shortenurl import short_url
 from bot.helper.ext_utils.exceptions import DirectDownloadLinkException, NotSupportedExtractionArchive
 from bot.helper.mirror_utils.download_utils.aria2_download import add_aria2c_download
 from bot.helper.mirror_utils.download_utils.gd_downloader import add_gd_download
-from bot.helper.mirror_utils.download_utils.qbit_downloader import QbDownloader
 from bot.helper.mirror_utils.download_utils.mega_downloader import MegaDownloader
 from bot.helper.mirror_utils.download_utils.direct_link_generator import direct_link_generator
 from bot.helper.mirror_utils.download_utils.telegram_downloader import TelegramDownloadHelper
@@ -40,13 +39,12 @@ from bot.helper.ext_utils.db_handler import DbManger
 
 
 class MirrorListener:
-    def __init__(self, bot, message, isZip=False, extract=False, isQbit=False, isLeech=False, pswd=None, tag=None):
+    def __init__(self, bot, message, isZip=False, extract=False, isLeech=False, pswd=None, tag=None):
         self.bot = bot
         self.message = message
         self.uid = self.message.message_id
         self.extract = extract
         self.isZip = isZip
-        self.isQbit = isQbit
         self.isLeech = isLeech
         self.pswd = pswd
         self.tag = tag
@@ -72,7 +70,7 @@ class MirrorListener:
             name = str(download.name()).replace('/', '')
             gid = download.gid()
             size = download.size_raw()
-            if name == "None" or self.isQbit or not ospath.exists(f'{DOWNLOAD_DIR}{self.uid}/{name}'):
+            if name == "None" or not ospath.exists(f'{DOWNLOAD_DIR}{self.uid}/{name}'):
                 name = listdir(f'{DOWNLOAD_DIR}{self.uid}')[-1]
             m_path = f'{DOWNLOAD_DIR}{self.uid}/{name}'
         if self.isZip:
@@ -94,7 +92,7 @@ class MirrorListener:
                 LOGGER.info('File to archive not found!')
                 self.onUploadError('Internal error occurred!!')
                 return
-            if not self.isQbit or not QB_SEED or self.isLeech:
+            if not self.isLeech:
                 try:
                     rmtree(m_path)
                 except:
@@ -245,7 +243,7 @@ class MirrorListener:
             if BUTTON_SIX_NAME is not None and BUTTON_SIX_URL is not None:
                 buttons.buildbutton(f"{BUTTON_SIX_NAME}", f"{BUTTON_SIX_URL}")
             sendMarkup(msg, self.bot, self.message, InlineKeyboardMarkup(buttons.build_menu(2)))
-            if self.isQbit and QB_SEED and not self.extract:
+            if not self.extract:
                 if self.isZip:
                     try:
                         osremove(f'{DOWNLOAD_DIR}{self.uid}/{name}')
@@ -282,16 +280,14 @@ class MirrorListener:
         if not self.isPrivate and INCOMPLETE_TASK_NOTIFIER and DB_URI is not None:
             DbManger().rm_complete_task(self.message.link)
 
-def _mirror(bot, message, isZip=False, extract=False, isQbit=False, isLeech=False, pswd=None, multi=0):
+def _mirror(bot, message, isZip=False, extract=False, isLeech=False, pswd=None, multi=0):
     mesg = message.text.split('\n')
     message_args = mesg[0].split(' ', maxsplit=1)
-    name_args = mesg[0].split('|', maxsplit=1)
-    qbitsel = False
+    name_args = mesg[0].split('|', maxsplit=
     is_gdtot = False
     try:
         link = message_args[1]
-        if link.startswith("s ") or link == "s":
-            qbitsel = True
+        if link.startswith("s ") or link == "
             message_args = mesg[0].split(' ', maxsplit=2)
             link = message_args[2].strip()
         elif link.isdigit():
@@ -343,8 +339,8 @@ def _mirror(bot, message, isZip=False, extract=False, isQbit=False, isLeech=Fals
                 reply_text = reply_to.text
                 if is_url(reply_text) or is_magnet(reply_text):
                     link = reply_text.strip()
-            elif file.mime_type != "application/x-bittorrent" and not isQbit:
-                listener = MirrorListener(bot, message, isZip, extract, isQbit, isLeech, pswd, tag)
+            elif file.mime_type != "application/x-bittorrent":
+                listener = MirrorListener(bot, message, isZip, extract, isLeech, pswd, tag)
                 tg_downloader = TelegramDownloadHelper(listener)
                 tg_downloader.add_download(message, f'{DOWNLOAD_DIR}{listener.uid}/', name)
                 if multi > 1:
@@ -354,7 +350,7 @@ def _mirror(bot, message, isZip=False, extract=False, isQbit=False, isLeech=Fals
                     nextmsg.from_user.id = message.from_user.id
                     multi -= 1
                     sleep(3)
-                    Thread(target=_mirror, args=(bot, nextmsg, isZip, extract, isQbit, isLeech, pswd, multi)).start()
+                    Thread(target=_mirror, args=(bot, nextmsg, isZip, extract, isLeech, pswd, multi)).start()
                 return
             else:
                 link = file.get_file().file_path
@@ -365,16 +361,14 @@ def _mirror(bot, message, isZip=False, extract=False, isQbit=False, isLeech=Fals
         help_msg += "\n\n<b>By replying to link or file:</b>"
         help_msg += "\n<code>/command</code> |newname pswd: xx [zip/unzip]"
         help_msg += "\n\n<b>Direct link authorization:</b>"
-        help_msg += "\n<code>/command</code> {link} |newname pswd: xx\nusername\npassword"
-        help_msg += "\n\n<b>Qbittorrent selection:</b>"
-        help_msg += "\n<code>/qbcommand</code> <b>s</b> {link} or by replying to {file/link}"
+        help_msg += "\n<code>/command</code> {link} |newname pswd: xx\nusername\npassword" 
         help_msg += "\n\n<b>Multi links only by replying to first link or file:</b>"
         help_msg += "\n<code>/command</code> 10(number of links/files)"
         return sendMessage(help_msg, bot, message)
 
     LOGGER.info(link)
 
-    if not is_mega_link(link) and not isQbit and not is_magnet(link) \
+    if not is_mega_link(link) and not is_magnet(link) \
         and not is_gdrive_link(link) and not link.endswith('.torrent'):
         content_type = get_content_type(link)
         if content_type is None or re_match(r'text/html|text/plain', content_type):
@@ -387,7 +381,7 @@ def _mirror(bot, message, isZip=False, extract=False, isQbit=False, isLeech=Fals
                 if str(e).startswith('ERROR:'):
                     return sendMessage(str(e), bot, message)
 
-    listener = MirrorListener(bot, message, isZip, extract, isQbit, isLeech, pswd, tag)
+    listener = MirrorListener(bot, message, isZip, extract, isLeech, pswd, tag)
 
     if is_gdrive_link(link):
         if not isZip and not extract and not isLeech:
@@ -403,9 +397,6 @@ def _mirror(bot, message, isZip=False, extract=False, isQbit=False, isLeech=Fals
             Thread(target=mega_dl.add_download, args=(link, f'{DOWNLOAD_DIR}{listener.uid}/')).start()
         else:
             sendMessage('MEGA_API_KEY not Provided!', bot, message)
-    elif isQbit:
-        qb_dl = QbDownloader(listener)
-        Thread(target=qb_dl.add_qb_torrent, args=(link, f'{DOWNLOAD_DIR}{listener.uid}', qbitsel)).start()
     else:
         if len(mesg) > 1:
             try:
@@ -432,7 +423,7 @@ def _mirror(bot, message, isZip=False, extract=False, isQbit=False, isLeech=Fals
         nextmsg.from_user.id = message.from_user.id
         multi -= 1
         sleep(3)
-        Thread(target=_mirror, args=(bot, nextmsg, isZip, extract, isQbit, isLeech, pswd, multi)).start()
+        Thread(target=_mirror, args=(bot, nextmsg, isZip, extract, isLeech, pswd, multi)).start()
 
 
 def mirror(update, context):
@@ -444,15 +435,6 @@ def unzip_mirror(update, context):
 def zip_mirror(update, context):
     _mirror(context.bot, update.message, True)
 
-def qb_mirror(update, context):
-    _mirror(context.bot, update.message, isQbit=True)
-
-def qb_unzip_mirror(update, context):
-    _mirror(context.bot, update.message, extract=True, isQbit=True)
-
-def qb_zip_mirror(update, context):
-    _mirror(context.bot, update.message, True, isQbit=True)
-
 def leech(update, context):
     _mirror(context.bot, update.message, isLeech=True)
 
@@ -462,26 +444,11 @@ def unzip_leech(update, context):
 def zip_leech(update, context):
     _mirror(context.bot, update.message, True, isLeech=True)
 
-def qb_leech(update, context):
-    _mirror(context.bot, update.message, isQbit=True, isLeech=True)
-
-def qb_unzip_leech(update, context):
-    _mirror(context.bot, update.message, extract=True, isQbit=True, isLeech=True)
-
-def qb_zip_leech(update, context):
-    _mirror(context.bot, update.message, True, isQbit=True, isLeech=True)
-
 mirror_handler = CommandHandler(BotCommands.MirrorCommand, mirror,
                                 filters=CustomFilters.authorized_chat | CustomFilters.authorized_user, run_async=True)
 unzip_mirror_handler = CommandHandler(BotCommands.UnzipMirrorCommand, unzip_mirror,
                                 filters=CustomFilters.authorized_chat | CustomFilters.authorized_user, run_async=True)
 zip_mirror_handler = CommandHandler(BotCommands.ZipMirrorCommand, zip_mirror,
-                                filters=CustomFilters.authorized_chat | CustomFilters.authorized_user, run_async=True)
-qb_mirror_handler = CommandHandler(BotCommands.QbMirrorCommand, qb_mirror,
-                                filters=CustomFilters.authorized_chat | CustomFilters.authorized_user, run_async=True)
-qb_unzip_mirror_handler = CommandHandler(BotCommands.QbUnzipMirrorCommand, qb_unzip_mirror,
-                                filters=CustomFilters.authorized_chat | CustomFilters.authorized_user, run_async=True)
-qb_zip_mirror_handler = CommandHandler(BotCommands.QbZipMirrorCommand, qb_zip_mirror,
                                 filters=CustomFilters.authorized_chat | CustomFilters.authorized_user, run_async=True)
 leech_handler = CommandHandler(BotCommands.LeechCommand, leech,
                                 filters=CustomFilters.authorized_chat | CustomFilters.authorized_user, run_async=True)
@@ -489,22 +456,9 @@ unzip_leech_handler = CommandHandler(BotCommands.UnzipLeechCommand, unzip_leech,
                                 filters=CustomFilters.authorized_chat | CustomFilters.authorized_user, run_async=True)
 zip_leech_handler = CommandHandler(BotCommands.ZipLeechCommand, zip_leech,
                                 filters=CustomFilters.authorized_chat | CustomFilters.authorized_user, run_async=True)
-qb_leech_handler = CommandHandler(BotCommands.QbLeechCommand, qb_leech,
-                                filters=CustomFilters.authorized_chat | CustomFilters.authorized_user, run_async=True)
-qb_unzip_leech_handler = CommandHandler(BotCommands.QbUnzipLeechCommand, qb_unzip_leech,
-                                filters=CustomFilters.authorized_chat | CustomFilters.authorized_user, run_async=True)
-qb_zip_leech_handler = CommandHandler(BotCommands.QbZipLeechCommand, qb_zip_leech,
-                                filters=CustomFilters.authorized_chat | CustomFilters.authorized_user, run_async=True)
-
 dispatcher.add_handler(mirror_handler)
 dispatcher.add_handler(unzip_mirror_handler)
 dispatcher.add_handler(zip_mirror_handler)
-dispatcher.add_handler(qb_mirror_handler)
-dispatcher.add_handler(qb_unzip_mirror_handler)
-dispatcher.add_handler(qb_zip_mirror_handler)
 dispatcher.add_handler(leech_handler)
 dispatcher.add_handler(unzip_leech_handler)
 dispatcher.add_handler(zip_leech_handler)
-dispatcher.add_handler(qb_leech_handler)
-dispatcher.add_handler(qb_unzip_leech_handler)
-dispatcher.add_handler(qb_zip_leech_handler)
